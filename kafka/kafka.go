@@ -1,35 +1,53 @@
 package kakfa
 
+import (
+	"time"
+
+	"github.com/IBM/sarama"
+)
+
 // client is a kafka client
 type client struct {
+	saramaClient     sarama.Client
 	bootstrapServers []string
 	username         string
 	password         string
-	topic            []string
+	verbose          bool
+	producer
+	consumer
 }
 
-type kafkaOptions func(client *client)
-
-func WithBootstrapServers(servers []string) kafkaOptions {
-	return func(c *client) {
-		c.bootstrapServers = servers
-	}
+type producer struct {
+	topic string
 }
 
-func WithUsername(username string) kafkaOptions {
-	return func(c *client) {
-		c.username = username
-	}
+type consumer struct {
+	topic   []string
+	groupID string
 }
 
-func WithPassword(password string) kafkaOptions {
-	return func(c *client) {
-		c.password = password
+// NewClient creates a new kafka client
+func NewClient(opts ...kafkaOptions) (*client, error) {
+	client := client{}
+	for _, opt := range opts {
+		err := opt(&client)
+		if err != nil {
+			return nil, err
+		}
 	}
+
+	config := sarama.NewConfig()
+	config.Admin.Timeout = 3 * time.Second
+	saramaClient, err := sarama.NewClient(client.bootstrapServers, config)
+	if err != nil {
+		return nil, err
+	}
+
+	client.saramaClient = saramaClient
+
+	return &client, nil
 }
 
-func WithTopic(topic []string) kafkaOptions {
-	return func(c *client) {
-		c.topic = topic
-	}
+func (c *client) Close() error {
+	return c.saramaClient.Close()
 }
