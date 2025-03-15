@@ -9,6 +9,7 @@ import (
 // client is a kafka client
 type client struct {
 	saramaClient     sarama.Client
+	admin            sarama.ClusterAdmin
 	bootstrapServers []string
 	username         string
 	password         string
@@ -38,12 +39,19 @@ func NewClient(opts ...kafkaOptions) (*client, error) {
 
 	config := sarama.NewConfig()
 	config.Admin.Timeout = 3 * time.Second
+
 	saramaClient, err := sarama.NewClient(client.bootstrapServers, config)
 	if err != nil {
 		return nil, err
 	}
 
+	admin, err := sarama.NewClusterAdmin(client.bootstrapServers, config)
+	if err != nil {
+		return nil, err
+	}
+
 	client.saramaClient = saramaClient
+	client.admin = admin
 
 	return &client, nil
 }
