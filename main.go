@@ -9,6 +9,9 @@ import (
 	"go.uber.org/zap"
 )
 
+// version is set during build time using ldflags
+var version string
+
 // Request represents the MCP related request information
 type Request struct {
 	Submitter         string `json:"submitter" jsonschema:"required,description=The name of the thing calling this tool"`
@@ -18,6 +21,8 @@ type Request struct {
 }
 
 func main() {
+	zap.S().Infof("Starting mcp-kafkaversion %s", version)
+
 	done := make(chan struct{})
 
 	kafkaClient, err := kafka.NewClient(kafka.WithBootstrapServers([]string{"localhost:9092"}))
