@@ -28,13 +28,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = server.RegisterTool("list_topics", "List all available topics in a table format", kafkaHandler.ListTopics)
+	err = server.RegisterTool("list_topics", "List all available topics", kafkaHandler.ListTopics)
 	if err != nil {
 		zap.S().Errorf("error registering kafka topic resource: %v", err)
 		os.Exit(1)
 	}
 
 	err = server.RegisterTool("delete_topic", "Delete a topic", kafkaHandler.DeleteTopic)
+	if err != nil {
+		zap.S().Errorf("error registering kafka topic resource: %v", err)
+		os.Exit(1)
+	}
+
+	err = server.RegisterTool("describe_topic", "Describe a kafka topic", kafkaHandler.DescribeTopic)
 	if err != nil {
 		zap.S().Errorf("error registering kafka topic resource: %v", err)
 		os.Exit(1)
