@@ -28,6 +28,18 @@ func main() {
 		os.Exit(1)
 	}
 
+	err = server.RegisterTool("list_topics", "List all available topics in a table format", kafkaHandler.ListTopics)
+	if err != nil {
+		zap.S().Errorf("error registering kafka topic resource: %v", err)
+		os.Exit(1)
+	}
+
+	err = server.RegisterTool("delete_topic", "Delete a topic", kafkaHandler.DeleteTopic)
+	if err != nil {
+		zap.S().Errorf("error registering kafka topic resource: %v", err)
+		os.Exit(1)
+	}
+
 	if err := server.Serve(); err != nil {
 		zap.S().Errorf("error serving kafka mcp server: %v", err)
 		os.Exit(1)
