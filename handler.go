@@ -31,5 +31,53 @@ func (k *KafkaHandler) CreateTopic(ctx context.Context, req Request) (*mcp_golan
 		return nil, err
 	}
 
-	return mcp_golang.NewToolResponse(mcp_golang.NewTextContent(fmt.Sprintf("Creating topic %s", req.Topic))), nil
+	return mcp_golang.NewToolResponse(mcp_golang.NewTextContent(fmt.Sprintf("Topic %s is created", req.Topic))), nil
+}
+
+// DeleteTopic deletes an existing Kafka topic
+func (k *KafkaHandler) DeleteTopic(ctx context.Context, req Request) (*mcp_golang.ToolResponse, error) {
+
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	kafkaClient, err := kafka.NewClient(kafka.WithBootstrapServers([]string{"localhost:9092"}))
+	if err != nil {
+		return nil, err
+	}
+	defer kafkaClient.Close()
+
+	if err := kafkaClient.DeleteTopic(req.Topic); err != nil {
+		return nil, err
+	}
+
+	return mcp_golang.NewToolResponse(mcp_golang.NewTextContent(fmt.Sprintf("Topic %s is deleted", req.Topic))), nil
+}
+
+// ListTopics lists all existing Kafka topics
+func (k *KafkaHandler) ListTopics(ctx context.Context, req Request) (*mcp_golang.ToolResponse, error) {
+
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	kafkaClient, err := kafka.NewClient(kafka.WithBootstrapServers([]string{"localhost:9092"}))
+	if err != nil {
+		return nil, err
+	}
+	defer kafkaClient.Close()
+
+	topics, err := kafkaClient.ListTopics()
+	if err != nil {
+		return nil, err
+	}
+
+	i := 1
+	response := "Available Topics\n"
+	for k, v := range topics {
+		response += fmt.Sprintf("%d - Name: %s, Replication Factor: %d, Partitions: %d\n", i, k, v.ReplicationFactor, v.NumPartitions)
+
+	}
+
+	return mcp_golang.NewToolResponse(mcp_golang.NewTextContent(response)), nil
 }
