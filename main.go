@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	kafka "github.com/kanapuli/mcp-kafka/kafka"
 	mcp_golang "github.com/metoro-io/mcp-golang"
 	"github.com/metoro-io/mcp-golang/transport/stdio"
 	"go.uber.org/zap"
@@ -19,10 +20,19 @@ type Request struct {
 func main() {
 	done := make(chan struct{})
 
-	kafkaHandler := &KafkaHandler{}
+	kafkaClient, err := kafka.NewClient(kafka.WithBootstrapServers([]string{"localhost:9092"}))
+	if err != nil {
+		zap.S().Errorf("error creating kafka client: %v", err)
+		os.Exit(1)
+	}
+	defer kafkaClient.Close()
+
+	kafkaHandler := &KafkaHandler{
+		Client: kafkaClient,
+	}
 	server := mcp_golang.NewServer(stdio.NewStdioServerTransport(), mcp_golang.WithName("kafka"))
 
-	err := server.RegisterTool("create_topic", "Create a topic with the given number of partitions and replication factor", kafkaHandler.CreateTopic)
+	err = server.RegisterTool("create_topic", "Create a topic with the given number of partitions and replication factor", kafkaHandler.CreateTopic)
 	if err != nil {
 		zap.S().Errorf("error registering kafka topic resource: %v", err)
 		os.Exit(1)
