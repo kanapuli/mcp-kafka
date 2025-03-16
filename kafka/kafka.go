@@ -8,13 +8,12 @@ import (
 
 // Client is a kafka Client
 type Client struct {
-	saramaClient     sarama.Client
 	admin            sarama.ClusterAdmin
+	producer         sarama.SyncProducer
 	bootstrapServers []string
 	username         string
 	password         string
 	verbose          bool
-	producer
 	consumer
 }
 
@@ -30,6 +29,9 @@ type consumer struct {
 // NewClient creates a new kafka client
 func NewClient(opts ...kafkaOptions) (*Client, error) {
 	client := Client{}
+	config := sarama.NewConfig()
+	config.Admin.Timeout = 3 * time.Second
+
 	for _, opt := range opts {
 		err := opt(&client)
 		if err != nil {
@@ -37,25 +39,34 @@ func NewClient(opts ...kafkaOptions) (*Client, error) {
 		}
 	}
 
-	config := sarama.NewConfig()
-	config.Admin.Timeout = 3 * time.Second
-
-	saramaClient, err := sarama.NewClient(client.bootstrapServers, config)
-	if err != nil {
-		return nil, err
-	}
-
 	admin, err := sarama.NewClusterAdmin(client.bootstrapServers, config)
 	if err != nil {
 		return nil, err
 	}
-
-	client.saramaClient = saramaClient
 	client.admin = admin
+
+	producer, err := sarama.NewSyncProducer(client.bootstrapServers, config)
+	if err != nil {
+		return nil, err
+	}
+	client.producer = producer
 
 	return &client, nil
 }
 
 func (c *Client) Close() error {
-	return c.saramaClient.Close()
+	// The close calls must be called in the correct order
+	if c.producer != nil {
+		err := c.producer.Close()
+		if err != nil {
+			return err
+		}
+	}
+	if c.admin != nil {
+		err := c.admin.Close()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
