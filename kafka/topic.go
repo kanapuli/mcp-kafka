@@ -19,17 +19,15 @@ func (c *client) CreateTopic(topic string, numPartitions int32, replicationFacto
 
 // DeleteTopic deletes the specified topic.
 func (c *client) DeleteTopic(topic string) error {
-	if err := c.admin.DeleteTopic(topic); err != nil {
-		return err
-	}
-	return nil
+	return c.admin.DeleteTopic(topic)
 }
 
 // ListTopics lists all topics and their details.
 func (c *client) ListTopics() (map[string]sarama.TopicDetail, error) {
-	topics, err := c.admin.ListTopics()
-	if err != nil {
-		return nil, err
-	}
-	return topics, nil
+	return c.admin.ListTopics()
+}
+
+// DescribeTopics describes the specified topics.
+func (c *client) DescribeTopics(topics []string) ([]*sarama.TopicMetadata, error) {
+	return c.admin.DescribeTopics(topics)
 }
