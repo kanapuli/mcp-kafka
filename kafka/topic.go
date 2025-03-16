@@ -4,6 +4,7 @@ import (
 	"github.com/IBM/sarama"
 )
 
+// CreateTopic creates a new topic with the given name, number of partitions, and replication factor.
 func (c *client) CreateTopic(topic string, numPartitions int32, replicationFactor int16) error {
 	topicDetail := &sarama.TopicDetail{
 		NumPartitions:     numPartitions,
