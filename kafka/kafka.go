@@ -6,8 +6,8 @@ import (
 	"github.com/IBM/sarama"
 )
 
-// client is a kafka client
-type client struct {
+// Client is a kafka Client
+type Client struct {
 	saramaClient     sarama.Client
 	admin            sarama.ClusterAdmin
 	bootstrapServers []string
@@ -28,8 +28,8 @@ type consumer struct {
 }
 
 // NewClient creates a new kafka client
-func NewClient(opts ...kafkaOptions) (*client, error) {
-	client := client{}
+func NewClient(opts ...kafkaOptions) (*Client, error) {
+	client := Client{}
 	for _, opt := range opts {
 		err := opt(&client)
 		if err != nil {
@@ -56,6 +56,6 @@ func NewClient(opts ...kafkaOptions) (*client, error) {
 	return &client, nil
 }
 
-func (c *client) Close() error {
+func (c *Client) Close() error {
 	return c.saramaClient.Close()
 }
