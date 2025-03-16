@@ -27,7 +27,9 @@ func (c *client) ListTopics() (map[string]sarama.TopicDetail, error) {
 	return c.admin.ListTopics()
 }
 
-// DescribeTopics describes the specified topics.
-func (c *client) DescribeTopics(topics []string) ([]*sarama.TopicMetadata, error) {
-	return c.admin.DescribeTopics(topics)
+// DescribeTopic describes the specified topic.
+// Note: The method accepts currently just a single topic though the underlying client can handle a slice of topics
+// Let's leave the job to the LLM to call this method iteratively to handle multiple topics
+func (c *client) DescribeTopic(topics string) ([]*sarama.TopicMetadata, error) {
+	return c.admin.DescribeTopics([]string{topics})
 }
