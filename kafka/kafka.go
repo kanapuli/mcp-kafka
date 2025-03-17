@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/IBM/sarama"
+	"go.uber.org/zap"
 )
 
 // Client is a kafka Client
@@ -11,6 +12,7 @@ type Client struct {
 	admin            sarama.ClusterAdmin
 	producer         sarama.SyncProducer
 	consumer         sarama.ConsumerGroup
+	logger           *zap.SugaredLogger
 	bootstrapServers []string
 	username         string
 	password         string

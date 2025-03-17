@@ -2,6 +2,8 @@ package kafka
 
 import (
 	"errors"
+
+	"go.uber.org/zap"
 )
 
 type kafkaOptions func(client *Client) error
@@ -47,6 +49,13 @@ func WithConsumerGroupID(id string) kafkaOptions {
 			id = "mcp-kafka-consumer"
 		}
 		c.consumerGroupID = id
+		return nil
+	}
+}
+
+func WithLogger(logger *zap.SugaredLogger) kafkaOptions {
+	return func(c *Client) error {
+		c.logger = logger
 		return nil
 	}
 }
