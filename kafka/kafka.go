@@ -45,6 +45,15 @@ func NewClient(opts ...kafkaOptions) (*Client, error) {
 		}
 	}
 
+	if client.username != "" && client.password != "" {
+		config.Net.SASL.Enable = true
+		config.Net.SASL.Mechanism = sarama.SASLTypePlaintext
+		config.Net.SASL.User = client.username
+		config.Net.SASL.Password = client.password
+		// Support only SASL Plaintext
+		config.Net.TLS.Enable = false
+	}
+
 	admin, err := sarama.NewClusterAdmin(client.bootstrapServers, config)
 	if err != nil {
 		return nil, err
