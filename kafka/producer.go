@@ -9,14 +9,34 @@ import (
 )
 
 // Produce sends a message to the Kafka topic.
-func (c *Client) Produce(topic string, key []byte, message []byte) (string, error) {
+func (c *Client) Produce(topic string, key []byte, message []byte, headers map[string]any) (string, error) {
 	if key == nil {
 		key = []byte(uuid.New().String())
 	}
+	var (
+		msgHeaders   []sarama.RecordHeader
+		keyBytes     []byte
+		messageBytes []byte
+	)
+	for k, v := range headers {
+		// reset keyBytes and messageBytes
+		keyBytes = keyBytes[:0]
+		messageBytes = messageBytes[:0]
+
+		keyBytes = fmt.Appendf(keyBytes, "%s", k)
+		messageBytes = fmt.Appendf(messageBytes, "%v", v)
+
+		msgHeaders = append(msgHeaders, sarama.RecordHeader{
+			Key:   keyBytes,
+			Value: messageBytes,
+		})
+	}
+
 	msg := &sarama.ProducerMessage{
-		Topic: topic,
-		Value: sarama.StringEncoder(message),
-		Key:   sarama.StringEncoder(key),
+		Topic:   topic,
+		Value:   sarama.StringEncoder(message),
+		Key:     sarama.StringEncoder(key),
+		Headers: msgHeaders,
 	}
 
 	partition, offset, err := c.producer.SendMessage(msg)
