@@ -21,8 +21,17 @@ The mcp-kafka server provides the following Kafka operations:
 
 ### Prerequisites
 
-- Go 1.18 or higher
+- Go 1.24 or higher
 - A running Kafka cluster (default connection: localhost:9092)
+
+### Download Prebuilt Binaries
+
+Prebuilt binaries for multiple platforms are available on the [releases page](https://github.com/your-username/mcp-kafka/releases).
+
+Supported platforms:
+- Linux (amd64, arm64)
+- macOS (amd64, arm64)
+- Windows (amd64)
 
 ### Building from Source
 
@@ -35,6 +44,11 @@ The mcp-kafka server provides the following Kafka operations:
 2. Build the application:
    ```bash
    make build
+   ```
+
+3. Optionally, build for a specific platform:
+   ```bash
+   make build GOOS=darwin GOARCH=arm64
    ```
 
 ### Installing as a Claude Desktop Tool
