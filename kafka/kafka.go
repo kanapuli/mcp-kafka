@@ -30,7 +30,12 @@ type consumer struct {
 func NewClient(opts ...kafkaOptions) (*Client, error) {
 	client := Client{}
 	config := sarama.NewConfig()
+	// TODO: These configs should be really configurable by the LLM user
 	config.Admin.Timeout = 3 * time.Second
+	config.ClientID = "mcp-kafka"
+	config.Producer.Compression = sarama.CompressionSnappy
+	// Return.Successes is specific to SyncProducer in order to work.
+	config.Producer.Return.Successes = true
 
 	for _, opt := range opts {
 		err := opt(&client)
