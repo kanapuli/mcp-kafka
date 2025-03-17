@@ -106,3 +106,18 @@ func (k *KafkaHandler) DescribeTopic(ctx context.Context, req Request) (*mcp_gol
 
 	return mcp_golang.NewToolResponse(mcp_golang.NewTextContent(response)), nil
 }
+
+// Produce sends a message to the Kafka topic.
+func (k *KafkaHandler) Produce(ctx context.Context, req Request) (*mcp_golang.ToolResponse, error) {
+
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	response, err := k.Client.Produce(req.Topic, []byte(req.ProduceMessageKey), []byte(req.ProduceMessageValue), req.ProduceMessageHeaders)
+	if err != nil {
+		return nil, err
+	}
+
+	return mcp_golang.NewToolResponse(mcp_golang.NewTextContent(response)), nil
+}
