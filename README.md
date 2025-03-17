@@ -6,6 +6,7 @@ A Model Context Protocol (MCP) server for performing Kafka client operations fro
 
 mcp-kafka provides a bridge between AI assistants and Apache Kafka, allowing them to interact with Kafka clusters through the Model Context Protocol. This tool enables AI assistants to create, manage, and interact with Kafka topics and messages directly.
 
+![mcp-kafka-demo](./static/demo.gif)
 ## Features
 
 The mcp-kafka server provides the following Kafka operations:
