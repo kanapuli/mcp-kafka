@@ -24,15 +24,6 @@ The mcp-kafka server provides the following Kafka operations:
 - Go 1.24 or higher
 - A running Kafka cluster (default connection: localhost:9092)
 
-### Download Prebuilt Binaries
-
-Prebuilt binaries for multiple platforms are available on the [releases page](https://github.com/kanapuli/mcp-kafka/releases).
-
-Supported platforms:
-- Linux (amd64, arm64)
-- macOS (amd64, arm64)
-- Windows (amd64)
-
 ### Building from Source
 
 1. Clone the repository:
@@ -55,25 +46,20 @@ Supported platforms:
 
 To use mcp-kafka with Claude Desktop:
 
-1. Download the latest release from the [releases page](https://github.com/kanapuli/mcp-kafka/releases) or build from source.
+1. Build the application as mentioned above.
 
 2. Place the executable in a location included in your system PATH or in a dedicated tools directory.
 
-3. Configure Claude Desktop to recognize the tool:
-   - Open Claude Desktop settings
-   - Navigate to the Tools section
-   - Add a new tool pointing to the mcp-kafka executable
-   - Save your changes
+3. Please follow this [Claude Desktop Tool Installation Guide](https://modelcontextprotocol.io/quickstart/user) to install the tool.
 
-## Sample Claude Desktop config json
-
-Please look at the [Model Context Protocol for Claude Desktop](https://modelcontextprotocol.io/quickstart/user) documentation to get a general idea of how to setup the MCP tool.
+The JSON to be added to the claude_desktop_config.json file is as follows,
+Use the right username and password for SASL login. Leave them empty for PLAINTEXT authentication.
 
 ```json
 {
   "mcpServers": {
     "kafka": {
-	    "command": "/Path-to-your-mcp-kafka-binary/mcp-kafka-darwin-arm64",
+	    "command": "/Your-mcp-kafka-executable-path/mcp-kafka-darwin-arm64",
       "args": [
           "--bootstrap-servers=localhost:9092",
           "--consumer-group-id=mcp-kafka-consumer-group",
@@ -85,7 +71,6 @@ Please look at the [Model Context Protocol for Claude Desktop](https://modelcont
   }
 }
 ```
-
 
 ## Configuration
 
