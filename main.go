@@ -1,7 +1,10 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"os"
+	"strings"
 
 	kafka "github.com/kanapuli/mcp-kafka/kafka"
 	mcp_golang "github.com/metoro-io/mcp-golang"
@@ -33,17 +36,31 @@ type EnvArgs struct {
 }
 
 func main() {
-	zap.S().Infof("Starting mcp-kafkaversion %s", version)
+
+	logger, err := initLogger()
+	if err != nil {
+		fmt.Printf("error creating logger: %v", err)
+		os.Exit(1)
+	}
+
+	logger.Infof("Starting mcp-kafkaversion %s", version)
 
 	done := make(chan struct{})
 
-	envArgs := getEnvArgs()
+	bootstrapServersFlag := flag.String("bootstrap-servers", "localhost:9092", "Comma-separated list of Kafka bootstrap servers")
+	consumerGroupID := flag.String("consumer-group-id", "mcp-kafka-consumer-group", "Consumer group ID")
+	username := flag.String("username", "", "Kafka username")
+	password := flag.String("password", "", "Kafka password")
+	flag.Parse()
+
+	bootstrapServers := strings.Split(*bootstrapServersFlag, ",")
 
 	kafkaClient, err := kafka.NewClient(
-		kafka.WithBootstrapServers(envArgs.BootstrapServers),
-		kafka.WithConsumerGroupID(envArgs.ConsumerGroupID),
-		kafka.WithUsername(envArgs.Username),
-		kafka.WithPassword(envArgs.Password),
+		kafka.WithBootstrapServers(bootstrapServers),
+		kafka.WithConsumerGroupID(*consumerGroupID),
+		kafka.WithUsername(*username),
+		kafka.WithPassword(*password),
+		kafka.WithLogger(logger),
 	)
 	if err != nil {
 		zap.S().Errorf("error creating kafka client: %v", err)
@@ -53,6 +70,7 @@ func main() {
 
 	kafkaHandler := &KafkaHandler{
 		Client: kafkaClient,
+		Logger: logger,
 	}
 	server := mcp_golang.NewServer(stdio.NewStdioServerTransport(), mcp_golang.WithName("kafka"))
 
@@ -99,26 +117,16 @@ func main() {
 	<-done
 }
 
-func getEnvArgs() EnvArgs {
-	var bootstrapServers []string
-	bootstrapServersFromEnv := os.Getenv("BOOTSTRAP_SERVERS")
-	if bootstrapServersFromEnv == "" {
-		bootstrapServers = []string{"localhost:9092"}
+func initLogger() (*zap.SugaredLogger, error) {
+	logConfig := zap.NewProductionConfig()
+	// MCP currently requires logs to be written to stderr in order to be picked up in the logs
+	logConfig.OutputPaths = []string{"stderr"}
+	zapLogger, err := logConfig.Build()
+	if err != nil {
+		return nil, err
 	}
 
-	var consumerGroupID string
-	consumerGroupIDFromEnv := os.Getenv("CONSUMER_GROUP_ID")
-	if consumerGroupIDFromEnv == "" {
-		consumerGroupID = "mcp-kafka-consumer"
-	}
+	logger := zapLogger.Sugar()
 
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
-
-	return EnvArgs{
-		BootstrapServers: bootstrapServers,
-		ConsumerGroupID:  consumerGroupID,
-		Username:         username,
-		Password:         password,
-	}
+	return logger, nil
 }

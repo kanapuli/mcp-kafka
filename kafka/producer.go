@@ -5,7 +5,6 @@ import (
 
 	"github.com/IBM/sarama"
 	"github.com/google/uuid"
-	"go.uber.org/zap"
 )
 
 // Produce sends a message to the Kafka topic.
@@ -44,6 +43,5 @@ func (c *Client) Produce(topic string, key []byte, message []byte, headers map[s
 		return "", err
 	}
 	responseMsg := fmt.Sprintf("message successfully produced to the Topic: %s, Partition: %d, Offset: %d", topic, partition, offset)
-	zap.S().Infof(responseMsg)
 	return responseMsg, nil
 }
