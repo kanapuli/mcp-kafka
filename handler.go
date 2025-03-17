@@ -13,6 +13,7 @@ import (
 // KafkaHandler is a struct that handles Kafka operations for the mcp-kafka tool
 type KafkaHandler struct {
 	Client *kafka.Client
+	Logger *zap.SugaredLogger
 }
 
 // CreateTopic creates a new Kafka topic
@@ -138,7 +139,6 @@ func (k *KafkaHandler) Consume(ctx context.Context, req Request) (*mcp_golang.To
 	for i, msg := range response {
 		consumedMessages += fmt.Sprintf("%d. %s\n", i, msg)
 	}
-	zap.S().Infof("Consumed messages: %s", consumedMessages)
 
 	return mcp_golang.NewToolResponse(mcp_golang.NewTextContent(consumedMessages)), nil
 
