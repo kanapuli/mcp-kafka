@@ -1,4 +1,10 @@
 services:
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "broker:29092"
   broker:
     image: confluentinc/cp-kafka:7.9.0
     hostname: broker
