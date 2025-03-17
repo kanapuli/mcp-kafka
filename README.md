@@ -65,6 +65,27 @@ To use mcp-kafka with Claude Desktop:
    - Add a new tool pointing to the mcp-kafka executable
    - Save your changes
 
+## Sample Claude Desktop config json
+
+Please look at the [Model Context Protocol for Claude Desktop](https://modelcontextprotocol.io/quickstart/user) documentation to get a general idea of how to setup the MCP tool.
+
+```json
+{
+  "mcpServers": {
+    "kafka": {
+	    "command": "/Path-to-your-mcp-kafka-binary/mcp-kafka-darwin-arm64",
+      "args": [
+          "--bootstrap-servers=localhost:9092",
+          "--consumer-group-id=mcp-kafka-consumer-group",
+          "--username=",
+          "--password="
+        ],
+      "env": {}
+    }
+  }
+}
+```
+
 
 ## Configuration
 
@@ -72,7 +93,6 @@ The mcp-kafka tool accepts the following configuration parameters:
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| bootstrap_servers | Kafka bootstrap servers | localhost:9092 |
 | topic | Topic to interact with | (required) |
 | num_partitions | Number of partitions for topic creation | (optional) |
 | replication_factor | Replication factor for topic creation | (optional) |
@@ -80,6 +100,23 @@ The mcp-kafka tool accepts the following configuration parameters:
 | produce_message_value | Value for produced messages | (optional) |
 | produce_message_headers | Headers for produced messages | (optional) |
 | consumer_timeout | Timeout in seconds for message consumption | 10 |
+
+These parameters will be automatically derived from your Natural language message to the LLM.
+
+
+### CLI flags for the mcp-kafka tool
+
+The following flags should be used to configure the Kafka client:
+
+```
+--bootstrap-servers=localhost:9092
+--consumer-group-id=mcp-kafka-consumer-group
+--username='your_sasl_username'
+--password='your_sasl_password'
+
+```
+
+NOTE: Currently, SASL_PLAINTEXT is supported along with PLAINTEXT authentication. SASL_SSL is not supported.
 
 ## Contributing
 
