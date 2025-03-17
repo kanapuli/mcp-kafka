@@ -14,10 +14,14 @@ var version string
 
 // Request represents the MCP related request information
 type Request struct {
-	Submitter         string `json:"submitter" jsonschema:"required,description=The name of the thing calling this tool"`
-	Topic             string `json:"topic" jsonschema:"required,description=The topic which the kafka client should work with"`
-	NumPartitions     int32  `json:"num_partitions" jsonschema:"optional,description=The number of partitions for the topic"`
-	ReplicationFactor int16  `json:"replication_factor" jsonschema:"optional,description=The replication factor for the topic"`
+	Submitter             string         `json:"submitter" jsonschema:"required,description=The name of the thing calling this tool"`
+	BootstrapServers      string         `json:"bootstrap_servers" jsonschema:"required,description=The Kafka bootstrap servers to connect to. Defaults to localhost:9092" default:"localhost:9092"`
+	Topic                 string         `json:"topic" jsonschema:"required,description=The topic which the kafka client should work with"`
+	NumPartitions         int32          `json:"num_partitions" jsonschema:"optional,description=The number of partitions for the topic"`
+	ReplicationFactor     int16          `json:"replication_factor" jsonschema:"optional,description=The replication factor for the topic"`
+	ProduceMessageKey     string         `json:"produce_message_key" jsonschema:"optional,description=The key to use when producing messages"`
+	ProduceMessageValue   string         `json:"produce_message_value" jsonschema:"optional,description=The message content to use when producing messages"`
+	ProduceMessageHeaders map[string]any `json:"produce_message_headers" jsonschema:"optional,description=The message headers to use when producing messages"`
 }
 
 func main() {
@@ -56,6 +60,12 @@ func main() {
 	}
 
 	err = server.RegisterTool("describe_topic", "Describe a kafka topic", kafkaHandler.DescribeTopic)
+	if err != nil {
+		zap.S().Errorf("error registering kafka topic resource: %v", err)
+		os.Exit(1)
+	}
+
+	err = server.RegisterTool("produce_message", "Produce a message to a topic", kafkaHandler.Produce)
 	if err != nil {
 		zap.S().Errorf("error registering kafka topic resource: %v", err)
 		os.Exit(1)
