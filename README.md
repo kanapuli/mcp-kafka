@@ -26,7 +26,7 @@ The mcp-kafka server provides the following Kafka operations:
 
 ### Download Prebuilt Binaries
 
-Prebuilt binaries for multiple platforms are available on the [releases page](https://github.com/your-username/mcp-kafka/releases).
+Prebuilt binaries for multiple platforms are available on the [releases page](https://github.com/kanapuli/mcp-kafka/releases).
 
 Supported platforms:
 - Linux (amd64, arm64)
@@ -37,7 +37,7 @@ Supported platforms:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/mcp-kafka.git
+   git clone https://github.com/kanapuli/mcp-kafka.git
    cd mcp-kafka
    ```
 
@@ -55,7 +55,7 @@ Supported platforms:
 
 To use mcp-kafka with Claude Desktop:
 
-1. Download the latest release from the [releases page](https://github.com/your-username/mcp-kafka/releases) or build from source.
+1. Download the latest release from the [releases page](https://github.com/kanapuli/mcp-kafka/releases) or build from source.
 
 2. Place the executable in a location included in your system PATH or in a dedicated tools directory.
 
