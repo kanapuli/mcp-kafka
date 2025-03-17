@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	kafka "github.com/kanapuli/mcp-kafka/kafka"
 	mcp_golang "github.com/metoro-io/mcp-golang"
+	"go.uber.org/zap"
 )
 
 // KafkaHandler is a struct that handles Kafka operations for the mcp-kafka tool
@@ -120,4 +122,24 @@ func (k *KafkaHandler) Produce(ctx context.Context, req Request) (*mcp_golang.To
 	}
 
 	return mcp_golang.NewToolResponse(mcp_golang.NewTextContent(response)), nil
+}
+
+func (k *KafkaHandler) Consume(ctx context.Context, req Request) (*mcp_golang.ToolResponse, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	response, err := k.Client.SimpleConsume([]string{req.Topic}, time.Duration(req.ConsumerTimeout*int(time.Second)))
+	if err != nil {
+		return nil, err
+	}
+
+	consumedMessages := fmt.Sprintf("Hey %s, Here are the consumed messages for the topic: %v. Format it in a very presentable way\n", req.Submitter, req.Topic)
+	for i, msg := range response {
+		consumedMessages += fmt.Sprintf("%d. %s\n", i, msg)
+	}
+	zap.S().Infof("Consumed messages: %s", consumedMessages)
+
+	return mcp_golang.NewToolResponse(mcp_golang.NewTextContent(consumedMessages)), nil
+
 }
