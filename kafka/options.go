@@ -40,3 +40,13 @@ func WithVerbose(verbose bool) kafkaOptions {
 		return nil
 	}
 }
+
+func WithConsumerGroupID(id string) kafkaOptions {
+	return func(c *Client) error {
+		if id == "" {
+			id = "mcp-kafka-consumer"
+		}
+		c.consumerGroupID = id
+		return nil
+	}
+}
