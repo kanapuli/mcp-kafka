@@ -22,7 +22,7 @@ type Request struct {
 	ProduceMessageKey     string         `json:"produce_message_key" jsonschema:"optional,description=The key to use when producing messages"`
 	ProduceMessageValue   string         `json:"produce_message_value" jsonschema:"optional,description=The message content to use when producing messages"`
 	ProduceMessageHeaders map[string]any `json:"produce_message_headers" jsonschema:"optional,description=The message headers to use when producing messages"`
-	ConsumerGroupID       string         `json:"consumer_group_id" jsonschema:"optional,description=The consumer group ID to use when consuming messages"`
+	ConsumerTimeout       int            `json:"consumer_timeout" jsonschema:"optional,description=The timeout in seconds for consuming messages.Defaults to 10 seconds" default:"10"`
 }
 
 func main() {
@@ -70,6 +70,12 @@ func main() {
 	}
 
 	err = server.RegisterTool("produce_message", "Produce a message to a topic", kafkaHandler.Produce)
+	if err != nil {
+		zap.S().Errorf("error registering kafka topic resource: %v", err)
+		os.Exit(1)
+	}
+
+	err = server.RegisterTool("consume_messages", "Consume messages from a topic", kafkaHandler.Consume)
 	if err != nil {
 		zap.S().Errorf("error registering kafka topic resource: %v", err)
 		os.Exit(1)
