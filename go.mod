@@ -4,6 +4,7 @@ go 1.24.1
 
 require (
 	github.com/IBM/sarama v1.45.1
+	github.com/google/uuid v1.6.0
 	github.com/metoro-io/mcp-golang v0.8.0
 	go.uber.org/zap v1.27.0
 )
@@ -16,7 +17,6 @@ require (
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
