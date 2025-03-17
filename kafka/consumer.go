@@ -3,7 +3,6 @@ package kafka
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/IBM/sarama"
@@ -51,7 +50,7 @@ func (c *Client) ConsumeWithoutTimeout(topics []string, messageHandler func(*sar
 	go func() {
 		for {
 			if err := c.consumer.Consume(ctx, topics, handler); err != nil {
-				log.Printf("Error consuming messages: %v", err)
+				c.logger.Errorf("Error consuming messages: %v", err)
 			}
 			if ctx.Err() != nil {
 				return
@@ -77,7 +76,7 @@ func (c *Client) SimpleConsume(topics []string, timeout time.Duration) ([]string
 		case c.messagesChan <- msg:
 		// message added to the channel
 		default:
-			zap.S().Debugf("Message dropped because channel is full: %s", msg)
+			c.logger.Debugf("Message dropped because channel is full: %s", msg)
 		}
 		return nil
 	}
@@ -92,7 +91,7 @@ func (c *Client) SimpleConsume(topics []string, timeout time.Duration) ([]string
 		select {
 		case msg := <-c.messagesChan:
 			messages = append(messages, msg)
-			zap.S().Debugf("Message received: %s", msg)
+			c.logger.Debugf("Message received: %s", msg)
 		case <-ctx.Done():
 			return messages, nil
 		}
